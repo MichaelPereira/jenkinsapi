@@ -5,6 +5,7 @@ Module for JenkinsBase class
 import ast
 import pprint
 import logging
+import six.moves.urllib.parse as urlparse
 from jenkinsapi import config
 from jenkinsapi.custom_exceptions import JenkinsAPIException
 
@@ -30,7 +31,7 @@ class JenkinsBase(object):
         Initialize a jenkins connection
         """
         self._data = None
-        self.baseurl = self.strip_trailing_slash(baseurl)
+        self.baseurl = self._quote_url_path(self.strip_trailing_slash(baseurl))
         if poll:
             self.poll()
 
@@ -52,6 +53,16 @@ class JenkinsBase(object):
         while url.endswith('/'):
             url = url[:-1]
         return url
+
+    def _quote_url_path(self, url):
+        """
+        Quotes path of given url, encoding special characters as a safety
+        measure when making requests
+        """
+        url_parts = list(urlparse.urlsplit(url))
+        # path is index 2 as specified in urlparse documentation
+        url_parts[2] = urlparse.quote(url_parts[2])
+        return urlparse.urlunsplit(url_parts)
 
     def poll(self, tree=None):
         data = self._poll(tree=tree)
