@@ -480,3 +480,29 @@ class Build(JenkinsBase):
                 url, data='', valid=[302, 200, 500, ])
             return True
         return False
+
+    def term(self):
+        """
+        Issues a term command to the build if its running
+        :return boolean True if succeded False otherwise or the build
+            is not running
+        """
+        if self.is_running():
+            url = "%s/term" % self.baseurl
+            self.job.jenkins.requester.post_and_confirm_status(
+                url, data='', valid=[302, 200, 500, ])
+            return True
+        return False
+
+    def kill(self):
+        """
+        Issues a kill command to the build if its running
+        :return boolean True if succeded False otherwise or the build
+            is not running
+        """
+        if self.is_running():
+            url = "%s/kill" % self.baseurl
+            self.job.jenkins.requester.post_and_confirm_status(
+                url, data='', valid=[302, 200, 500, ])
+            return True
+        return False
